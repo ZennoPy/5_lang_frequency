@@ -14,6 +14,9 @@ def load_data(filepath):
 
 def pre_treatment_text(text):
 
+    nltk.download('punkt')
+    nltk.download('stopwords')
+    
     language_text = detect(text)
     text_without_digits = re.sub(r'[\d]+', r'', text).strip()
     tokenize_text = nltk.word_tokenize(text_without_digits)

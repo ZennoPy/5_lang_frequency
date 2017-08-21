@@ -20,25 +20,30 @@ def pre_treatment_text(text):
     language_text = detect(text)
     text_without_digits = re.sub(r'[\d]+', r'', text).strip()
     tokenize_text = nltk.word_tokenize(text_without_digits)
-    tokenize_text_lower = [value.lower() for value in tokenize_text]
-    text_without_punctuation = [value for value in tokenize_text_lower if value not in punctuation]
-    text_without_whitespace = [value for value in text_without_punctuation if value not in whitespace]
-    text_without_quotes = [value.replace("«", "").replace("»", "") for value in text_without_whitespace]
-    clean_text = [value for value in text_without_quotes if value != '']
+    tokenize_text_lower = [value_token.lower() for value_token in tokenize_text]
+    tokenize_text_without_punctuation = [value_token for value_token in tokenize_text_lower if value_token
+                                         not in punctuation]
+    tokenize_text_without_whitespace = [value_token for value_token in tokenize_text_without_punctuation if value_token
+                                        not in whitespace]
+    tokenize_text_without_quotes = [value_token.replace("«", "").replace("»", "") for value_token
+                                    in tokenize_text_without_whitespace]
+    tokenize_clean_text = [value_token for value_token in tokenize_text_without_quotes if value_token != '']
 
     if language_text == 'ru':
         stop_words = stopwords.words('russian')
         stop_words.extend(['что', 'это', 'так', 'вот', 'быть', 'как', 'в', '—', 'к', 'на', "для"])
-        text_without_stopwords = [value for value in clean_text if (value not in stop_words)]
+        tokenize_text_without_stopwords = [value_token for value_token in tokenize_clean_text if
+                                           (value_token not in stop_words)]
     elif language_text == 'en':
-        text_without_stopwords = [value for value in clean_text if (value not in stopwords.words('english'))]
+        tokenize_text_without_stopwords = [value_token for value_token in tokenize_clean_text if
+                                           (value_token not in stopwords.words('english'))]
 
-    return text_without_stopwords
+    return tokenize_text_without_stopwords
 
 
-def get_most_frequent_words(text_without_stopwords):
+def get_most_frequent_words(tokenize_text_without_stopwords):
     number_of_words = 10
-    return Counter(text_without_stopwords).most_common(number_of_words)
+    return Counter(tokenize_text_without_stopwords).most_common(number_of_words)
 
 if __name__ == '__main__':
     try:

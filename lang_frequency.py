@@ -1,10 +1,6 @@
-import nltk
 import re
 import sys
 from langdetect import detect
-from string import punctuation
-from string import whitespace
-from nltk.corpus import stopwords
 from collections import Counter
 
 
@@ -14,36 +10,23 @@ def load_data(filepath):
 
 def pre_treatment_text(text):
 
-    nltk.download('punkt')
-    nltk.download('stopwords')
-    
+    list_of_words = re.findall(r'\w+', text.lower())
     language_text = detect(text)
-    text_without_digits = re.sub(r'[\d]+', r'', text).strip()
-    tokenize_text = nltk.word_tokenize(text_without_digits)
-    tokenize_text_lower = [value_token.lower() for value_token in tokenize_text]
-    tokenize_text_without_punctuation = [value_token for value_token in tokenize_text_lower if value_token
-                                         not in punctuation]
-    tokenize_text_without_whitespace = [value_token for value_token in tokenize_text_without_punctuation if value_token
-                                        not in whitespace]
-    tokenize_text_without_quotes = [value_token.replace("«", "").replace("»", "") for value_token
-                                    in tokenize_text_without_whitespace]
-    tokenize_clean_text = [value_token for value_token in tokenize_text_without_quotes if value_token != '']
 
     if language_text == 'ru':
-        stop_words = stopwords.words('russian')
-        stop_words.extend(['что', 'это', 'так', 'вот', 'быть', 'как', 'в', '—', 'к', 'на', "для"])
-        tokenize_text_without_stopwords = [value_token for value_token in tokenize_clean_text if
-                                           (value_token not in stop_words)]
+        stop_words = ['что', 'это', 'так', 'вот', 'быть', 'как', 'в', '—', 'к', 'на', 'для', 'и', 'не', 'с']
+        list_of_words_without_stopwords = [word for word in list_of_words if (word not in stop_words)]
     elif language_text == 'en':
-        tokenize_text_without_stopwords = [value_token for value_token in tokenize_clean_text if
-                                           (value_token not in stopwords.words('english'))]
+        stop_words = ['and', 'to', 'the', 'that', 'in', 'of', 'i', '—', 'with', 'they', 'hem']
+        list_of_words_without_stopwords = [word for word in list_of_words if (word not in stop_words)]
 
-    return tokenize_text_without_stopwords
+    return list_of_words_without_stopwords
 
 
-def get_most_frequent_words(tokenize_text_without_stopwords):
+def get_most_frequent_words(list_of_words):
     number_of_words = 10
-    return Counter(tokenize_text_without_stopwords).most_common(number_of_words)
+    return Counter(list_of_words).most_common(number_of_words)
+
 
 if __name__ == '__main__':
     try:
